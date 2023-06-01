@@ -1,11 +1,14 @@
 package ru.netology.testmode.test;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static com.codeborne.selenide.Condition.exactText;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.*;
 import static ru.netology.testmode.data.DataGenerator.Registration.getRegisteredUser;
 import static ru.netology.testmode.data.DataGenerator.Registration.getUser;
@@ -26,16 +29,20 @@ class AuthTest {
         $("[data-test-id='login'] input").setValue(registeredUser.getLogin());
         $("[data-test-id='password'] input").setValue(registeredUser.getPassword());
         $$("button").find(exactText("Продолжить")).click();
+        $(byText("Личный кабинет")).shouldBe(visible);
     }
 
     @Test
     @DisplayName("Should get error message if login with not registered user")
     void shouldGetErrorIfNotRegisteredUser() {
         var notRegisteredUser = getUser("active");
-        //Configuration.holdBrowserOpen = true;
         $("[data-test-id='login'] input").setValue(notRegisteredUser.getLogin());
         $("[data-test-id='password'] input").setValue(notRegisteredUser.getPassword());
         $$("button").find(exactText("Продолжить")).click();
+        $(byText("Ошибка!")).shouldBe(visible);
+        $(".notification__content")
+                .shouldHave(Condition.text("Неверно указан логин или пароль"))
+                .shouldBe(visible);
     }
 
     @Test
@@ -45,6 +52,10 @@ class AuthTest {
         $("[data-test-id='login'] input").setValue(blockedUser.getLogin());
         $("[data-test-id='password'] input").setValue(blockedUser.getPassword());
         $$("button").find(exactText("Продолжить")).click();
+        $(byText("Ошибка!")).shouldBe(visible);
+        $(".notification__content")
+                .shouldHave(Condition.text("Пользователь заблокирован"))
+                .shouldBe(visible);
     }
 
     @Test
@@ -55,6 +66,10 @@ class AuthTest {
         $("[data-test-id='login'] input").setValue(wrongLogin);
         $("[data-test-id='password'] input").setValue(registeredUser.getPassword());
         $$("button").find(exactText("Продолжить")).click();
+        $(byText("Ошибка!")).shouldBe(visible);
+        $(".notification__content")
+                .shouldHave(Condition.text("Неверно указан логин или пароль"))
+                .shouldBe(visible);
     }
 
     @Test
@@ -65,5 +80,9 @@ class AuthTest {
         $("[data-test-id='login'] input").setValue(registeredUser.getLogin());
         $("[data-test-id='password'] input").setValue(wrongPassword);
         $$("button").find(exactText("Продолжить")).click();
+        $(byText("Ошибка!")).shouldBe(visible);
+        $(".notification__content")
+                .shouldHave(Condition.text("Неверно указан логин или пароль"))
+                .shouldBe(visible);
     }
 }

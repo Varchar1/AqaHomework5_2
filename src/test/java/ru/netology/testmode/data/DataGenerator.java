@@ -28,7 +28,7 @@ public class DataGenerator {
     private static void sendRequest(RegistrationDto user) {
         given()
                 .spec(requestSpec)
-                .body(new RegistrationDto("vasya", "password", "active"))
+                .body(new RegistrationDto(user.login, user.password, user.status))
                 .when()
                 .post("/api/system/users")
                 .then()
